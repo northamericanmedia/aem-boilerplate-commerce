@@ -1,0 +1,8 @@
+mountpoints:
+  /:
+    url: https://content.da.live/northamericanmedia/aem-boilerplate-commerce/
+    type: markup
+
+folders:
+  /products/: /products/default
+
