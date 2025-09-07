@@ -2,6 +2,9 @@ mountpoints:
   /:
     url: https://content.da.live/northamericanmedia/boilerplate-commerce/
     type: markup
+  /es/:
+    url: https://content.da.live/northamericanmedia/boilerplate-commerce/es/
+    type: markup
 
 folders:
   /products/: /products/default
