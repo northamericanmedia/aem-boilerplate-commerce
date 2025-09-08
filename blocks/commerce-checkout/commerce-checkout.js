@@ -124,12 +124,14 @@ function setMetaTags(dropin) {
 }
 
 export default async function decorate(block) {
-  setMetaTags('Checkout');
-  document.title = 'Checkout';
+  const labels = await fetchPlaceholders();
+  
+  setMetaTags(labels['Checkout.title'] || 'Checkout');
+  document.title = labels['Checkout.title'] || 'Checkout';
 
   events.on('order/placed', () => {
-    setMetaTags('Order Confirmation');
-    document.title = 'Order Confirmation';
+    setMetaTags(labels['OrderConfirmation.title'] || 'Order Confirmation');
+    document.title = labels['OrderConfirmation.title'] || 'Order Confirmation';
   });
 
   const DEBOUNCE_TIME = 1000;
@@ -247,7 +249,7 @@ export default async function decorate(block) {
 
     UI.render(Header, {
       className: 'checkout-header',
-      title: 'Checkout',
+      title: labels['Checkout.title'] || 'Checkout',
       size: 'large',
       divider: true,
       level: 1,
@@ -386,7 +388,7 @@ export default async function decorate(block) {
       variant: 'secondary',
       slots: {
         Heading: (headingCtx) => {
-          const title = 'Your Cart ({count})';
+          const title = labels['Checkout.CartSummary.title'] || 'Your Cart ({count})';
 
           const cartSummaryListHeading = document.createElement('div');
           cartSummaryListHeading.classList.add('cart-summary-list__heading');
@@ -404,7 +406,7 @@ export default async function decorate(block) {
           editCartLink.classList.add('cart-summary-list__edit');
           editCartLink.href = rootLink('/cart');
           editCartLink.rel = 'noreferrer';
-          editCartLink.innerText = 'Edit';
+          editCartLink.innerText = labels['Checkout.CartSummary.edit'] || 'Edit';
 
           cartSummaryListHeading.appendChild(cartSummaryListHeadingText);
           cartSummaryListHeading.appendChild(editCartLink);
@@ -635,7 +637,7 @@ export default async function decorate(block) {
       const storeConfig = checkoutApi.getStoreConfigCache();
 
       shippingForm = await AccountProvider.render(AddressForm, {
-        addressesFormTitle: 'Shipping address',
+        addressesFormTitle: labels['Checkout.ShippingAddress.title'] || 'Shipping address',
         className: 'checkout-shipping-form__address-form',
         fieldIdPrefix: 'shipping',
         formName: SHIPPING_FORM_NAME,
@@ -687,7 +689,7 @@ export default async function decorate(block) {
       }, ADDRESS_INPUT_DEBOUNCE_TIME);
 
       billingForm = await AccountProvider.render(AddressForm, {
-        addressesFormTitle: 'Billing address',
+        addressesFormTitle: labels['Checkout.BillingAddress.title'] || 'Billing address',
         className: 'checkout-billing-form__address-form',
         fieldIdPrefix: 'billing',
         formName: BILLING_FORM_NAME,
@@ -760,7 +762,7 @@ export default async function decorate(block) {
       }, ADDRESS_INPUT_DEBOUNCE_TIME);
 
       shippingAddresses = await AccountProvider.render(Addresses, {
-        addressFormTitle: 'Deliver to new address',
+        addressFormTitle: labels['Checkout.ShippingAddress.newAddress'] || 'Deliver to new address',
         defaultSelectAddressId: shippingAddressId,
         fieldIdPrefix: 'shipping',
         formName: SHIPPING_FORM_NAME,
@@ -779,7 +781,7 @@ export default async function decorate(block) {
         showBillingCheckBox: false,
         showSaveCheckBox: true,
         showShippingCheckBox: false,
-        title: 'Shipping address',
+        title: labels['Checkout.ShippingAddress.title'] || 'Shipping address',
       })($shippingForm);
     }
 
@@ -823,7 +825,7 @@ export default async function decorate(block) {
       }, ADDRESS_INPUT_DEBOUNCE_TIME);
 
       billingAddresses = await AccountProvider.render(Addresses, {
-        addressFormTitle: 'Bill to new address',
+        addressFormTitle: labels['Checkout.BillingAddress.newAddress'] || 'Bill to new address',
         defaultSelectAddressId: billingAddressId,
         formName: BILLING_FORM_NAME,
         forwardFormRef: billingFormRef,
@@ -840,7 +842,7 @@ export default async function decorate(block) {
         showBillingCheckBox: false,
         showSaveCheckBox: true,
         showShippingCheckBox: false,
-        title: 'Billing address',
+        title: labels['Checkout.BillingAddress.title'] || 'Billing address',
       })($billingForm);
     }
   }
@@ -894,7 +896,6 @@ export default async function decorate(block) {
       '.order-confirmation__footer',
     );
 
-    const labels = await fetchPlaceholders();
     const langDefinitions = {
       default: {
         ...labels,
@@ -979,14 +980,14 @@ export default async function decorate(block) {
       <div class="order-confirmation-footer__continue-button"></div>
       <div class="order-confirmation-footer__contact-support">
         <p>
-          Need help?
+          ${labels['OrderConfirmation.needHelp'] || 'Need help?'}
           <a
             href="${rootLink(SUPPORT_PATH)}"
             rel="noreferrer"
             class="order-confirmation-footer__contact-support-link"
             data-testid="order-confirmation-footer__contact-support-link"
           >
-            Contact us
+            ${labels['OrderConfirmation.contactUs'] || 'Contact us'}
           </a>
         </p>
       </div>
@@ -997,7 +998,7 @@ export default async function decorate(block) {
     );
 
     UI.render(Button, {
-      children: 'Continue shopping',
+      children: labels['OrderConfirmation.continueShopping'] || 'Continue shopping',
       'data-testid': 'order-confirmation-footer__continue-button',
       className: 'order-confirmation-footer__continue-button',
       size: 'medium',
