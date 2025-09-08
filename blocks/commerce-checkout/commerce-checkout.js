@@ -125,13 +125,12 @@ function setMetaTags(dropin) {
 
 export default async function decorate(block) {
   const labels = await fetchPlaceholders();
-  
-  setMetaTags(labels['Checkout.title'] || 'Checkout');
-  document.title = labels['Checkout.title'] || 'Checkout';
+  setMetaTags(labels.Checkout?.title || 'Checkout');
+  document.title = labels.Checkout?.title || 'Checkout';
 
   events.on('order/placed', () => {
-    setMetaTags(labels['OrderConfirmation.title'] || 'Order Confirmation');
-    document.title = labels['OrderConfirmation.title'] || 'Order Confirmation';
+    setMetaTags(labels.OrderConfirmation?.Header?.title || 'Order Confirmation');
+    document.title = labels.OrderConfirmation?.Header?.title || 'Order Confirmation';
   });
 
   const DEBOUNCE_TIME = 1000;
@@ -249,7 +248,7 @@ export default async function decorate(block) {
 
     UI.render(Header, {
       className: 'checkout-header',
-      title: labels['Checkout.title'] || 'Checkout',
+      title: labels.Checkout?.title || 'Checkout',
       size: 'large',
       divider: true,
       level: 1,
@@ -388,7 +387,7 @@ export default async function decorate(block) {
       variant: 'secondary',
       slots: {
         Heading: (headingCtx) => {
-          const title = labels['Checkout.CartSummary.title'] || 'Your Cart ({count})';
+          const title = labels.Checkout?.Summary?.Edit ? `${labels.Cart?.Cart?.heading || 'Your Cart ({count})'}` : 'Your Cart ({count})';
 
           const cartSummaryListHeading = document.createElement('div');
           cartSummaryListHeading.classList.add('cart-summary-list__heading');
@@ -406,7 +405,7 @@ export default async function decorate(block) {
           editCartLink.classList.add('cart-summary-list__edit');
           editCartLink.href = rootLink('/cart');
           editCartLink.rel = 'noreferrer';
-          editCartLink.innerText = labels['Checkout.CartSummary.edit'] || 'Edit';
+          editCartLink.innerText = labels.Checkout?.Summary?.Edit || labels.Global?.CartEditButton || 'Edit';
 
           cartSummaryListHeading.appendChild(cartSummaryListHeadingText);
           cartSummaryListHeading.appendChild(editCartLink);
@@ -637,7 +636,7 @@ export default async function decorate(block) {
       const storeConfig = checkoutApi.getStoreConfigCache();
 
       shippingForm = await AccountProvider.render(AddressForm, {
-        addressesFormTitle: labels['Checkout.ShippingAddress.title'] || 'Shipping address',
+        addressesFormTitle: labels.OrderConfirmation?.Details?.shippingAddress || 'Shipping address',
         className: 'checkout-shipping-form__address-form',
         fieldIdPrefix: 'shipping',
         formName: SHIPPING_FORM_NAME,
@@ -689,7 +688,7 @@ export default async function decorate(block) {
       }, ADDRESS_INPUT_DEBOUNCE_TIME);
 
       billingForm = await AccountProvider.render(AddressForm, {
-        addressesFormTitle: labels['Checkout.BillingAddress.title'] || 'Billing address',
+        addressesFormTitle: labels.OrderConfirmation?.Details?.billingAddress || 'Billing address',
         className: 'checkout-billing-form__address-form',
         fieldIdPrefix: 'billing',
         formName: BILLING_FORM_NAME,
@@ -762,7 +761,7 @@ export default async function decorate(block) {
       }, ADDRESS_INPUT_DEBOUNCE_TIME);
 
       shippingAddresses = await AccountProvider.render(Addresses, {
-        addressFormTitle: labels['Checkout.ShippingAddress.newAddress'] || 'Deliver to new address',
+        addressFormTitle: labels.Account?.minifiedView?.Addresses?.differentAddressFormTitle || 'Deliver to new address',
         defaultSelectAddressId: shippingAddressId,
         fieldIdPrefix: 'shipping',
         formName: SHIPPING_FORM_NAME,
@@ -781,7 +780,7 @@ export default async function decorate(block) {
         showBillingCheckBox: false,
         showSaveCheckBox: true,
         showShippingCheckBox: false,
-        title: labels['Checkout.ShippingAddress.title'] || 'Shipping address',
+        title: labels.OrderConfirmation?.Details?.shippingAddress || 'Shipping address',
       })($shippingForm);
     }
 
@@ -825,7 +824,7 @@ export default async function decorate(block) {
       }, ADDRESS_INPUT_DEBOUNCE_TIME);
 
       billingAddresses = await AccountProvider.render(Addresses, {
-        addressFormTitle: labels['Checkout.BillingAddress.newAddress'] || 'Bill to new address',
+        addressFormTitle: labels.Account?.fullSizeView?.Addresses?.editAddressFormTitle || 'Bill to new address',
         defaultSelectAddressId: billingAddressId,
         formName: BILLING_FORM_NAME,
         forwardFormRef: billingFormRef,
@@ -842,7 +841,7 @@ export default async function decorate(block) {
         showBillingCheckBox: false,
         showSaveCheckBox: true,
         showShippingCheckBox: false,
-        title: labels['Checkout.BillingAddress.title'] || 'Billing address',
+        title: labels.OrderConfirmation?.Details?.billingAddress || 'Billing address',
       })($billingForm);
     }
   }
@@ -980,14 +979,14 @@ export default async function decorate(block) {
       <div class="order-confirmation-footer__continue-button"></div>
       <div class="order-confirmation-footer__contact-support">
         <p>
-          ${labels['OrderConfirmation.needHelp'] || 'Need help?'}
+          ${labels.OrderConfirmation?.Footer?.help || 'Need help?'}
           <a
             href="${rootLink(SUPPORT_PATH)}"
             rel="noreferrer"
             class="order-confirmation-footer__contact-support-link"
             data-testid="order-confirmation-footer__contact-support-link"
           >
-            ${labels['OrderConfirmation.contactUs'] || 'Contact us'}
+            ${labels.OrderConfirmation?.Footer?.contactSupport || 'Contact us'}
           </a>
         </p>
       </div>
@@ -998,7 +997,7 @@ export default async function decorate(block) {
     );
 
     UI.render(Button, {
-      children: labels['OrderConfirmation.continueShopping'] || 'Continue shopping',
+      children: labels.OrderConfirmation?.Footer?.continueShopping || 'Continue shopping',
       'data-testid': 'order-confirmation-footer__continue-button',
       className: 'order-confirmation-footer__continue-button',
       size: 'medium',
